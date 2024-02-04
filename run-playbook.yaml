@@ -1,5 +1,6 @@
+---
 - name: 'NGINX Reverse-Proxy Configuration in Containers'
-  hosts: group4
+  hosts: YOUR_SERVER
   become: true
 
   vars:
@@ -46,19 +47,45 @@
      - name: 'Change permissions of /var/run/docker.sock'
        file:
           path: /var/run/docker.sock
-          mode: 0777
+          mode: '0777'
 
      - name: 'Restart docker service'
        service:
           name: docker
           state: restarted
 
+     - name: 'Create directory for DuckDNS'
+       file:
+          path: '/home/{{ ansible_user }}/duckdns'
+          state: directory
+
+     - name: 'Copy DuckDNS script to server'
+       copy:
+          src: 'duck.sh'
+          dest: '/home/{{ ansible_user }}/duckdns'
+
+     - name: 'Make DuckDNS script executable'
+       file:
+          path: '/home/{{ ansible_user }}/duckdns/duck.sh'
+          mode: '0777'
+
+     - name: 'Run DuckDNS script'
+       command: '/home/{{ ansible_user }}/duckdns/duck.sh'
+
      - name: 'Copy all files to server in home directory'
        copy:
-          src: /home/user/ansible/playbooks/reverse-proxy-infrastructure
-          dest: /home/{{ ansible_user }}
+          src: '/home/YOUR_USER/YOUR_DIRECTORY'
+          dest: '/home/{{ ansible_user }}'
 
      - name: 'Build and run containers'
-       command: docker-compose up -d
+       command: 'docker-compose up -d'
        args:
-          chdir: /home/{{ ansible_user }}/reverse-proxy-infrastructure
+          chdir: '/home/{{ ansible_user }}/docker-nginx-reverse-proxy-infrastructure'
+
+     - name: Get Let\'s Encrypt certificates for domain gcpdevelopmentnginx.duckdns.org
+       shell: |
+          docker exec -it reverse-proxy /bin/bash -c "certbot --nginx --non-interactive --agree-tos --email YOUR_EMAIL@ --domains YOUR_DOMAIN --domains www.YOUR_DOMAIN"
+
+     - name: Get Let\'s Encrypt certificates for domains gcpproductionnginx.duckdns.org
+       shell: |
+          docker exec -it reverse-proxy /bin/bash -c "certbot --nginx --non-interactive --agree-tos --email YOUR_EMAIL@ --domains YOUR_DOMAIN --domains www.YOUR_DOMAIN"

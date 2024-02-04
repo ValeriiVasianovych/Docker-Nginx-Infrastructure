@@ -4,13 +4,15 @@
 
 This repository provides a streamlined deployment of an Nginx reverse proxy with Let's Encrypt SSL in Docker containers. The setup includes a `docker-compose.yaml` and an Ansible playbook (`run-playbook.yaml`).
 
-![alt text](image-1.png)
+### Scheme of project
+
+![alt text](project_scheme.png)
 
 ### Containers in this Setup:
 
--  Nginx Reverse Proxy container
--  Nginx Development container
--  Nginx Production container
+-  Nginx Reverse Proxy container with 404.html and 50x.html error pages
+-  Nginx Development container (for testing purposes)
+-  Nginx Production container (for production purposes)
 -  All containers are equipped with Let's Encrypt SSL certificates
 
 (You can easily extend this setup by adding more containers)
@@ -19,7 +21,7 @@ This repository provides a streamlined deployment of an Nginx reverse proxy with
 ## Prerequisites
 
 -  A domain name (you can use [DuckDNS](https://www.duckdns.org/) for a free domain name)
--  Public IP address
+-  Public IP address of your server instance
 -  Server instance (e.g., AWS EC2, DigitalOcean Droplet, etc.)
 -  Ansible installed on your local machine (if opting for the Ansible playbook)
 
@@ -30,3 +32,5 @@ This repository provides a streamlined deployment of an Nginx reverse proxy with
 3. Update `reverse-proxy-nginx-container/config` with your domain name and `proxy_pass` settings
 4. Update the `run-playbook.yaml` with your domain name and email address
 5. Run the Ansible playbook
+
+You should have to open the ports 80 and 443 in your server instance.
